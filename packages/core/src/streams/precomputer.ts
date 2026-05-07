@@ -164,16 +164,15 @@ class StreamPrecomputer {
 
     const selector = new StreamSelector(context.toExpressionContext());
 
-    // Initialize all streams with a score of 0
-    const streamScores = new Map<string, number>();
+    // initialise each stream's score and match list, and build an id -> stream
+    // map so we can resolve back to original references after selector.select()
+    const streamsById = new Map<string, ParsedStream>();
     for (const stream of streams) {
-      streamScores.set(stream.id, 0);
+      stream.streamExpressionScore = 0;
       stream.rankedStreamExpressionsMatched = [];
+      streamsById.set(stream.id, stream);
     }
 
-    // Evaluate each ranked expression and accumulate scores.
-    // Write rankedStreamExpressionsMatched onto each stream as we go so that
-    // subsequent expressions can query prior matches via rseMatched().
     for (const { expression, score, enabled } of this.userData
       .rankedStreamExpressions) {
       if (enabled === false) {
@@ -184,10 +183,11 @@ class StreamPrecomputer {
         const selectedStreams = await selector.select(streams, expression);
         const exprNames = extractNamesFromExpression(expression);
 
-        // Add the score to each matched stream
-        for (const stream of selectedStreams) {
-          const currentScore = streamScores.get(stream.id) ?? 0;
-          streamScores.set(stream.id, currentScore + score);
+        for (const selected of selectedStreams) {
+          const stream = streamsById.get(selected.id);
+          if (!stream) continue;
+          stream.streamExpressionScore =
+            (stream.streamExpressionScore ?? 0) + score;
           if (exprNames) {
             stream.rankedStreamExpressionsMatched = [
               ...(stream.rankedStreamExpressionsMatched ?? []),
@@ -202,11 +202,6 @@ class StreamPrecomputer {
           }`
         );
       }
-    }
-
-    // Apply the computed scores to the streams
-    for (const stream of streams) {
-      stream.streamExpressionScore = streamScores.get(stream.id) ?? 0;
     }
 
     const nonZeroScores = streams.filter(
