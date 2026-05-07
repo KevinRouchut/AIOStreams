@@ -1595,7 +1595,11 @@ export function extractNamesFromExpression(
   let match;
   while ((match = regex.exec(expression)) !== null) {
     const content = match[1];
-    if (!content.startsWith('#') || !ignoreHashPrefixed) {
+    if (content.startsWith('#')) {
+      if (!ignoreHashPrefixed) {
+        names.push(content.slice(1).trim());
+      }
+    } else {
       names.push(content);
     }
   }

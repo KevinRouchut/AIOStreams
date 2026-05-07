@@ -168,6 +168,7 @@ class StreamPrecomputer {
     const streamScores = new Map<string, number>();
     for (const stream of streams) {
       streamScores.set(stream.id, 0);
+      stream.rankedStreamExpressionsMatched = [];
     }
 
     // Evaluate each ranked expression and accumulate scores.

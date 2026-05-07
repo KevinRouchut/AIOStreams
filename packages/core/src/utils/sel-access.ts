@@ -265,9 +265,7 @@ export class SelAccess {
 
       // Match by extracted names vs stored exprNames
       if (o.exprNames && o.exprNames.length > 0) {
-        const names = extractNamesFromExpression(expr.expression, false)?.map(
-          (n) => (n.startsWith('#') ? n.slice(1).trim() : n)
-        );
+        const names = extractNamesFromExpression(expr.expression, false);
         const matches = (list?: string[]) =>
           !!list &&
           list.length === o.exprNames!.length &&
