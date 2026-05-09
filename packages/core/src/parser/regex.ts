@@ -81,8 +81,10 @@ export const PARSE_REGEX: PARSE_REGEX = {
   visualTags: {
     '10bit': createRegex('10[ .\\-_]?bit|hi10p?'),
     'HDR10+': createRegex('hdr[ .\\-_]?10[ .\\-_]?(p(lus)?|[+])'),
-    HDR10: createRegex('hdr[ .\\-_]?10(?![ .\\-_]?(?:\\+|p(lus)?))'),
-    HDR: createRegex('hdr(?![ .\\-_]?10)(?![ .\\-_]?(?:\\+|p(lus)?))'),
+    HDR10: createRegex('hdr[ .\\-_]?10(?![ .\\-_]?(?:\\+|p(?:lus)?|bit|hi))'),
+    HDR: createRegex(
+      'hdr(?![ .\\-_]?(?:10(?![ .\\-_]?(?:bit|hi))|\\+|p(?:lus)?))'
+    ),
     HLG: createRegex('hlg'),
     DV: createRegex('do?(lby)?[ .\\-_]?vi?(sion)?(?:[ .\\-_]?atmos)?|dv'),
     '3D': createRegex('(bd)?(3|three)[ .\\-_]?(d(imension)?(al)?)'),
